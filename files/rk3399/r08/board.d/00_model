@@ -5,8 +5,8 @@
 
 board_config_update
 
-ucidef_set_board_id "zimo,zcube1-max"
-ucidef_set_model_name "ZCuble1 Max"
+ucidef_set_board_id "rk3399,r08"
+ucidef_set_model_name "R08"
 
 board_config_flush
 
