@@ -19,8 +19,8 @@ SUBVER=$1
 
 # Kernel image sources
 ###################################################################
-KERNEL_TAGS="rk35xx"
-KERNEL_BRANCHES="bsp:rk35xx:>=:5.10 mainline:all:>=:6.1"
+KERNEL_TAGS="stable"
+KERNEL_BRANCHES="mainline:all:>=:6.1"
 MODULES_TGZ=${KERNEL_PKG_HOME}/modules-${KERNEL_VERSION}.tar.gz
 check_file ${MODULES_TGZ}
 BOOT_TGZ=${KERNEL_PKG_HOME}/boot-${KERNEL_VERSION}.tar.gz
@@ -72,7 +72,7 @@ SYSFIXTIME_PATCH="${PWD}/files/sysfixtime.patch"
 SSL_CNF_PATCH="${PWD}/files/openssl_engine.patch"
 
 # 20201212 add
-BAL_CONFIG="${PWD}/files/rk3399/zcube1-max/balance_irq"
+BAL_CONFIG="${PWD}/files/rk3399/r08/balance_irq"
 
 # 20210307 add
 SS_LIB="${PWD}/files/ss-glibc/lib-glibc.tar.xz"
@@ -84,9 +84,9 @@ DOCKERD_PATCH="${PWD}/files/dockerd.patch"
 
 # 20200416 add
 FIRMWARE_TXZ="${PWD}/files/firmware_armbian.tar.xz"
-BOOTFILES_HOME="${PWD}/files/bootfiles/rockchip/rk3399/zcube1-max"
+BOOTFILES_HOME="${PWD}/files/bootfiles/rockchip/rk3399/r08"
 GET_RANDOM_MAC="${PWD}/files/get_random_mac.sh"
-BOOTLOADER_IMG="${PWD}/files/rk3399/zcube1-max/bootloader.bin"
+BOOTLOADER_IMG="${PWD}/files/rk3399/r08/uboot-r08.bin"
 
 # 20210618 add
 DOCKER_README="${PWD}/files/DockerReadme.pdf"
@@ -107,15 +107,15 @@ DDBR="${PWD}/files/openwrt-ddbr"
 SSH_CIPHERS="aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr,chacha20-poly1305@openssh.com"
 SSHD_CIPHERS="aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr"
 # 20220927 add
-BOARD_HOME="${PWD}/files/rk3399/zcube1-max/board.d"
+BOARD_HOME="${PWD}/files/rk3399/r08/board.d"
 # 20221001 add
 MODULES_HOME="${PWD}/files/rk3399/modules.d"
 # 20221123 add
-BOARD_MODULES_HOME="${PWD}/files/rk3399/zcube1-max/modules.d"
+BOARD_MODULES_HOME="${PWD}/files/rk3399/r08/modules.d"
 # 20221013 add
-WIRELESS_CONFIG="${PWD}/files/rk3399/zcube1-max/wireless"
+#WIRELESS_CONFIG="${PWD}/files/rk3399/zcube1-max/wireless"
 # 20231101 add
-BREATHING_LIGHT="${PWD}/files/rk3399/zcube1-max/aw2028"
+#BREATHING_LIGHT="${PWD}/files/rk3399/zcube1-max/aw2028"
 ####################################################################
 
 check_depends
