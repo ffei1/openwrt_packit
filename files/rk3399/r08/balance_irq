@@ -15,3 +15,12 @@
 #  配置文件改好，运行 balethirq.pl 即时生效
 
 eth0 		6
+xhci-hcd:usb1	4
+xhci-hcd:usb2	4
+xhci-hcd:usb3	4
+xhci-hcd:usb4	4
+xhci-hcd:usb5	4
+xhci-hcd:usb6	4
+xhci-hcd:usb7	4
+xhci-hcd:usb8	4
+xhci-hcd:usb9	4
