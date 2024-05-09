@@ -159,7 +159,7 @@ adjust_openssl_config
 adjust_qbittorrent_config
 adjust_getty_config
 adjust_samba_config
-adjust_nfs_config "mmcblk0p4"
+adjust_nfs_config "mmcblk2p4"
 adjust_openssh_config
 adjust_openclash_config
 use_xrayplug_replace_v2rayplug
