@@ -48,7 +48,7 @@ KMOD_BLACKLIST="${PWD}/files/kmod_blacklist"
 
 FIRSTRUN_SCRIPT="${PWD}/files/first_run.sh"
 
-DAEMON_JSON="${PWD}/files/rk3399/daemon.json"
+DAEMON_JSON="${PWD}/files/rk3399/r08/daemon.json"
 
 TTYD="${PWD}/files/ttyd"
 FLIPPY="${PWD}/files/scripts_deprecated/flippy_cn"
