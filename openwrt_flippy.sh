@@ -28,9 +28,9 @@ PACKAGE_FILE="openwrt-armvirt-64-generic-rootfs.tar.gz"
 
 # Set the list of supported device
 PACKAGE_OPENWRT=(
-    "rock5b" "ak88" "h88k" "h88k-v3"
+    "rock5b" "rock5c" "ak88" "h88k" "h88k-v3"
     "r66s" "r68s" "e25" "photonicat" "cm3"
-    "watermelon-pi" "zcube1-max" "jp-tvbox" "ht2" "h28k" "h66k" "h68k" "h69k" "h69k-max"
+    "watermelon-pi" "zcube1-max" "jp-tvbox" "ht2" "e20c" "h28k" "h66k" "h68k" "h69k" "h69k-max"
     "fine3399" "r08"
     "beikeyun" "l1pro"
     "vplus"
@@ -39,10 +39,10 @@ PACKAGE_OPENWRT=(
     "diy"
 )
 # Set the list of devices using the [ rk3588 ] kernel
-PACKAGE_OPENWRT_RK3588=("rock5b" "ak88" "h88k" "h88k-v3")
+PACKAGE_OPENWRT_RK3588=("rock5b" "rock5c" "ak88" "h88k" "h88k-v3")
 # Set the list of devices using the [ rk35xx ] kernel
 # Devices from the rk3528/rk3566/rk3568 series can utilize the rk35xx and rk3588 kernels.
-PACKAGE_OPENWRT_RK35XX=("watermelon-pi" "zcube1-max" "jp-tvbox" "ht2" "h28k" "h66k" "h68k" "h69k" "h69k-max")
+PACKAGE_OPENWRT_RK35XX=("watermelon-pi" "zcube1-max" "jp-tvbox" "ht2" "e20c" "h28k" "h66k" "h68k" "h69k" "h69k-max")
 # Set the list of devices using the [ 6.x.y ] kernel
 PACKAGE_OPENWRT_6XY=("r66s" "r68s" "e25" "photonicat" "cm3")
 # All are packaged by default, and independent settings are supported, such as: [ s905x3_s905d_rock5b ]
@@ -72,6 +72,7 @@ SCRIPT_ZCUBE1MAX_FILE="mk_rk3399_zcube1-max.sh"
 SCRIPT_FINE3399_FILE="mk_rk3399_fine3399.sh"
 SCRIPT_CM3_FILE="mk_rk3566_radxa-cm3-rpi-cm4-io.sh"
 SCRIPT_HT2_FILE="mk_rk3528_ht2.sh"
+SCRIPT_E20C_FILE="mk_rk3528_e20c.sh"
 SCRIPT_H28K_FILE="mk_rk3528_h28k.sh"
 SCRIPT_H66K_FILE="mk_rk3568_h66k.sh"
 SCRIPT_H68K_FILE="mk_rk3568_h68k.sh"
@@ -86,6 +87,7 @@ SCRIPT_E25_FILE="mk_rk3568_e25.sh"
 SCRIPT_PHOTONICAT_FILE="mk_rk3568_photonicat.sh"
 SCRIPT_WATERMELONPI_FILE="mk_rk3568_watermelon-pi.sh"
 SCRIPT_ROCK5B_FILE="mk_rk3588_rock5b.sh"
+SCRIPT_ROCK5C_FILE="mk_rk3588_rock5c.sh"
 SCRIPT_S905_FILE="mk_s905_mxqpro+.sh"
 SCRIPT_S905D_FILE="mk_s905d_n1.sh"
 SCRIPT_S905X2_FILE="mk_s905x2_x96max.sh"
@@ -149,6 +151,7 @@ init_var() {
     [[ -n "${SCRIPT_FINE3399}" ]] || SCRIPT_FINE3399="${SCRIPT_FINE3399_FILE}"
     [[ -n "${SCRIPT_CM3}" ]] || SCRIPT_CM3="${SCRIPT_CM3_FILE}"
     [[ -n "${SCRIPT_HT2}" ]] || SCRIPT_HT2="${SCRIPT_HT2_FILE}"
+    [[ -n "${SCRIPT_E20C}" ]] || SCRIPT_E20C="${SCRIPT_E20C_FILE}"
     [[ -n "${SCRIPT_H28K}" ]] || SCRIPT_H28K="${SCRIPT_H28K_FILE}"
     [[ -n "${SCRIPT_H66K}" ]] || SCRIPT_H66K="${SCRIPT_H66K_FILE}"
     [[ -n "${SCRIPT_H68K}" ]] || SCRIPT_H68K="${SCRIPT_H68K_FILE}"
@@ -163,6 +166,7 @@ init_var() {
     [[ -n "${SCRIPT_PHOTONICAT}" ]] || SCRIPT_PHOTONICAT="${SCRIPT_PHOTONICAT_FILE}"
     [[ -n "${SCRIPT_WATERMELONPI}" ]] || SCRIPT_WATERMELONPI="${SCRIPT_WATERMELONPI_FILE}"
     [[ -n "${SCRIPT_ROCK5B}" ]] || SCRIPT_ROCK5B="${SCRIPT_ROCK5B_FILE}"
+    [[ -n "${SCRIPT_ROCK5C}" ]] || SCRIPT_ROCK5C="${SCRIPT_ROCK5C_FILE}"
     [[ -n "${SCRIPT_S905}" ]] || SCRIPT_S905="${SCRIPT_S905_FILE}"
     [[ -n "${SCRIPT_S905D}" ]] || SCRIPT_S905D="${SCRIPT_S905D_FILE}"
     [[ -n "${SCRIPT_S905X2}" ]] || SCRIPT_S905X2="${SCRIPT_S905X2_FILE}"
@@ -229,10 +233,14 @@ init_var() {
 init_packit_repo() {
     cd /opt
 
-    # Clone the repository into the packaging directory
+    # Clone the repository into the packaging directory. If it fails, wait 1 minute and try again, try 10 times.
     [[ -d "${SELECT_PACKITPATH}" ]] || {
         echo -e "${STEPS} Start cloning repository [ ${SCRIPT_REPO_URL} ], branch [ ${SCRIPT_REPO_BRANCH} ] into [ ${SELECT_PACKITPATH} ]"
-        git clone -q --single-branch --depth=1 --branch=${SCRIPT_REPO_BRANCH} ${SCRIPT_REPO_URL} ${SELECT_PACKITPATH}
+        for i in {1..10}; do
+            git clone -q --single-branch --depth=1 --branch=${SCRIPT_REPO_BRANCH} ${SCRIPT_REPO_URL} ${SELECT_PACKITPATH}
+            [[ "${?}" -eq "0" ]] && break || sleep 60
+        done
+        [[ -d "${SELECT_PACKITPATH}" ]] || error_msg "Failed to clone the repository."
     }
 
     # Check the *rootfs.tar.gz package
@@ -241,8 +249,13 @@ init_packit_repo() {
     # Load *-armvirt-64-default-rootfs.tar.gz
     rm -f ${SELECT_PACKITPATH}/${PACKAGE_FILE}
     if [[ "${OPENWRT_ARMVIRT}" == http* ]]; then
-        echo -e "${STEPS} curl [ ${OPENWRT_ARMVIRT} ] file into [ ${SELECT_PACKITPATH} ]"
-        curl -fsSL "${OPENWRT_ARMVIRT}" -o "${SELECT_PACKITPATH}/${PACKAGE_FILE}"
+        echo -e "${STEPS} Download the [ ${OPENWRT_ARMVIRT} ] file into [ ${SELECT_PACKITPATH} ]"
+
+        # Download the *-armvirt-64-default-rootfs.tar.gz file. If the download fails, try again 10 times.
+        for i in {1..10}; do
+            curl -fsSL "${OPENWRT_ARMVIRT}" -o "${SELECT_PACKITPATH}/${PACKAGE_FILE}"
+            [[ "${?}" -eq "0" ]] && break || sleep 60
+        done
         [[ "${?}" -eq "0" ]] || error_msg "Openwrt rootfs file download failed."
     else
         echo -e "${STEPS} copy [ ${GITHUB_WORKSPACE}/${OPENWRT_ARMVIRT} ] file into [ ${SELECT_PACKITPATH} ]"
@@ -263,8 +276,13 @@ init_packit_repo() {
     [[ -n "${SCRIPT_DIY_PATH}" ]] && {
         rm -f ${SELECT_PACKITPATH}/${SCRIPT_DIY}
         if [[ "${SCRIPT_DIY_PATH}" == http* ]]; then
-            echo -e "${INFO} Use curl to download custom script file: [ ${SCRIPT_DIY_PATH} ]"
-            curl -fsSL "${SCRIPT_DIY_PATH}" -o "${SELECT_PACKITPATH}/${SCRIPT_DIY}"
+            echo -e "${INFO} Download the custom script file: [ ${SCRIPT_DIY_PATH} ]"
+
+            # Download the custom script file. If the download fails, try again 10 times.
+            for i in {1..10}; do
+                curl -fsSL "${SCRIPT_DIY_PATH}" -o "${SELECT_PACKITPATH}/${SCRIPT_DIY}"
+                [[ "${?}" -eq "0" ]] && break || sleep 60
+            done
             [[ "${?}" -eq "0" ]] || error_msg "Custom script file download failed."
         else
             echo -e "${INFO} Copy custom script file: [ ${SCRIPT_DIY_PATH} ]"
@@ -383,11 +401,16 @@ download_kernel() {
                     kernel_down_from="https://github.com/${KERNEL_REPO_URL}/releases/download/kernel_${vb}/${kernel_var}.tar.gz"
                     echo -e "${INFO} (${x}.${i}) [ ${vb} - ${kernel_var} ] Kernel download from [ ${kernel_down_from} ]"
 
-                    curl -fsSL "${kernel_down_from}" -o "${kernel_path}/${kernel_var}.tar.gz"
-                    [[ "${?}" -ne "0" ]] && error_msg "Failed to download the kernel files from the server."
+                    # Download the kernel file. If the download fails, try again 10 times.
+                    for i in {1..10}; do
+                        curl -fsSL "${kernel_down_from}" -o "${kernel_path}/${kernel_var}.tar.gz"
+                        [[ "${?}" -eq "0" ]] && break || sleep 60
+                    done
+                    [[ "${?}" -eq "0" ]] || error_msg "Failed to download the kernel files from the server."
 
+                    # Decompress the kernel file
                     tar -mxf "${kernel_path}/${kernel_var}.tar.gz" -C "${kernel_path}"
-                    [[ "${?}" -ne "0" ]] && error_msg "[ ${kernel_var} ] kernel decompression failed."
+                    [[ "${?}" -eq "0" ]] || error_msg "[ ${kernel_var} ] kernel decompression failed."
                 else
                     echo -e "${INFO} (${x}.${i}) [ ${vb} - ${kernel_var} ] Kernel is in the local directory."
                 fi
@@ -496,6 +519,7 @@ EOF
                         cm3)              [[ -f "${SCRIPT_CM3}" ]]             && sudo ./${SCRIPT_CM3} ;;
                         ak88)             [[ -f "${SCRIPT_H88K}" ]]            && sudo ./${SCRIPT_H88K} ;;
                         ht2)              [[ -f "${SCRIPT_HT2}" ]]             && sudo ./${SCRIPT_HT2} ;;
+                        e20c)             [[ -f "${SCRIPT_E20C}" ]]            && sudo ./${SCRIPT_E20C} ;;
                         h28k)             [[ -f "${SCRIPT_H28K}" ]]            && sudo ./${SCRIPT_H28K} ;;
                         h88k)             [[ -f "${SCRIPT_H88K}" ]]            && sudo ./${SCRIPT_H88K} "25" ;;
                         h88k-v3)          [[ -f "${SCRIPT_H88KV3}" ]]          && sudo ./${SCRIPT_H88KV3} ;;
@@ -508,6 +532,7 @@ EOF
                         r66s)             [[ -f "${SCRIPT_R66S}" ]]            && sudo ./${SCRIPT_R66S} ;;
                         r68s)             [[ -f "${SCRIPT_R68S}" ]]            && sudo ./${SCRIPT_R68S} ;;
                         rock5b)           [[ -f "${SCRIPT_ROCK5B}" ]]          && sudo ./${SCRIPT_ROCK5B} ;;
+                        rock5c)           [[ -f "${SCRIPT_ROCK5C}" ]]          && sudo ./${SCRIPT_ROCK5C} ;;
                         e25)              [[ -f "${SCRIPT_E25}" ]]             && sudo ./${SCRIPT_E25} ;;
                         photonicat)       [[ -f "${SCRIPT_PHOTONICAT}" ]]      && sudo ./${SCRIPT_PHOTONICAT} ;;
                         watermelon-pi)    [[ -f "${SCRIPT_WATERMELONPI}" ]]    && sudo ./${SCRIPT_WATERMELONPI} ;;
