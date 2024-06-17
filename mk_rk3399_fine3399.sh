@@ -86,7 +86,7 @@ DOCKERD_PATCH="${PWD}/files/dockerd.patch"
 FIRMWARE_TXZ="${PWD}/files/firmware_armbian.tar.xz"
 BOOTFILES_HOME="${PWD}/files/bootfiles/rockchip/rk3399/fine3399"
 GET_RANDOM_MAC="${PWD}/files/get_random_mac.sh"
-BOOTLOADER_IMG="${PWD}/files/rk3399/fine3399/uboot-bozz-fine3399.bin"
+BOOTLOADER_IMG="${PWD}/files/rk3399/fine3399/uboot-fine3399.bin"
 
 # 20210618 add
 DOCKER_README="${PWD}/files/DockerReadme.pdf"

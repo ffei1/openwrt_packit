@@ -1,6 +1,6 @@
 verbosity=7
 bootlogo=true
-fdtfile=rockchip/rk3399-fine3399-full.dtb
+fdtfile=rockchip/rk3399-fine3399-plus.dtb
 rootdev=/dev/mmcblk2p2
 rootfstype=btrfs 
 rootflags=compress=zstd:6
