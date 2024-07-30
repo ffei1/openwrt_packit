@@ -16,6 +16,8 @@
 
 # lan
 eth0 		6
-
-xhci-hcd:usb7	4
+# wan
 xhci-hcd:usb5	4
+
+# usb 3.0
+xhci-hcd:usb7	5
