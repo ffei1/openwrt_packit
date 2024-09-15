@@ -112,10 +112,8 @@ BOARD_HOME="${PWD}/files/rk3399/fine3399/board.d"
 MODULES_HOME="${PWD}/files/rk3399/modules.d"
 # 20221123 add
 BOARD_MODULES_HOME="${PWD}/files/rk3399/fine3399/modules.d"
-# 20221013 add
-#WIRELESS_CONFIG="${PWD}/files/rk3399/zcube1-max/wireless"
-# 20231101 add
-#BREATHING_LIGHT="${PWD}/files/rk3399/zcube1-max/aw2028"
+# 20240915 add
+R8152_FIX="${PWD}/files/rk3399/fine3399/12-r8152-disable-offload"
 ####################################################################
 
 check_depends
@@ -153,6 +151,11 @@ echo
 echo "修改根文件系统相关配置 ... "
 cd $TGT_ROOT
 copy_supplement_files
+
+echo "该机型有RTL8153B USB网卡，故添加防断流补丁"
+cp -v ${R8152_FIX} ./etc/hotplug.d/iface/
+echo "完成"
+
 extract_glibc_programs
 adjust_docker_config
 adjust_openssl_config
